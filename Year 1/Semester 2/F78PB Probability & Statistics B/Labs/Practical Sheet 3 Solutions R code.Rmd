@@ -1,0 +1,227 @@
+---
+title: "Practical Sheet 3 Solutions"
+output: html_notebook
+---
+
+```{r}
+set.seed(1)
+```
+
+
+### Question 1
+
+Using the method of moments we have the estimator
+$$
+\hat{\mu}=\bar{X}
+$$
+A 95% confidence interval is then
+$$
+(\bar{X}-1.96\frac{\sigma}{\sqrt{n}},\bar{X}+1.96\frac{\sigma}{\sqrt{n}})
+$$
+We are given that $\sigma=1$ so it remains to calculate the mean, $\bar{x}$.
+```{r}
+data1=c(15.9,14.5,12.7,13.8,14.2)
+xbar=mean(data1)
+xbar-1.96/sqrt(5)
+xbar+1.96/sqrt(5)
+```
+So we have the $95\%$ confidence interval
+$$
+(13.34,15.10)
+$$
+
+Now we simulate more data with $\mu=15$:
+```{r}
+x1 = rnorm(200, 15, 1)
+x2 = rnorm(200, 15, 1)
+x3 = rnorm(200, 15, 1)
+x4 = rnorm(200, 15, 1)
+x5 = rnorm(200, 15, 1)
+m1 = cbind(x1, x2, x3, x4, x5)
+```
+
+We can view two samples of the data
+```{r}
+m1[1,]
+m1[2,]
+```
+
+Calculate the mean:
+```{r}
+sample.mean = apply(m1, 1, mean)
+```
+The confidence interval bounds
+```{r}
+ci.lower = sample.mean - 1.96/sqrt(5)
+ci.upper = sample.mean + 1.96/sqrt(5)
+data.frame(ci.lower, ci.upper)
+```
+
+We can count the numbers that do not contain $\mu$ by first ordering the CIs based on their lower interval
+```{r}
+dd = data.frame(ci.lower, ci.upper)
+dd[with(dd, order(ci.lower)), ]
+```
+```{r}
+count <- sum(dd$ci.lower <= 15 & dd$ci.upper >= 15)
+200-count
+```
+
+
+If we look through we find there are $12$ which do not contain $\mu=15$. For a 95% CI we would only expect 5% of 200 (i.e. 10) not to contain the sample
+mean. Bear in mind this is a simulation which will give different results every time.
+
+### Question 2
+
+Remember you can add the data to your environment by using the command 
+
+scan()
+
+```{r}
+data_mobile=c(45.8, 41.1, 55.9, 46.6, 57, 45, 58.5, 46.7, 49.3, 52.7, 54.9, 
+48.5, 40.4, 44.4, 51, 44.2, 59.1, 46.9, 50.7, 43.7, 41.7, 52.8, 
+60.5, 38.5, 60.4, 53.8, 47.3, 50.2, 58.8, 50.7)
+
+data_tv= c(23.1, 15.9, 21, 26, 25.1, 14.7, 24.2, 16.6, 18.2, 16.5, 20.7, 
+15.3, 17.7, 19.1, 22.7, 21.9, 14.6, 26.3, 25.8, 9.4, 17, 21.2, 
+17.9, 24.7, 21.1, 17.2, 19.1, 22.7, 24, 24.7, 22.5, 8.3, 2.5, 
+30.4)
+
+data_travel=c(3.7, 14.3, 11, 26.5, 5.2, 4.8, 24.2, 16.9, 8.2, 26.5, 40.7, 
+5.3)
+```
+
+For (a), this can be considered as a large sample so we use the approximation to the
+normal distribution and s rather than σ
+```{r}
+mean(data_mobile) + c(1,-1) * qnorm(0.025) * sd(data_mobile)/sqrt(30)
+mean(data_mobile) + c(1,-1) * qnorm(0.005) * sd(data_mobile)/sqrt(30)
+```
+
+For (b), again, this can be considered as a large sample so we use the approximation to the normal distribution and s rather than σ
+```{r}
+mean(data_tv) + c(1,-1) * qnorm(0.025) * sd(data_tv)/sqrt(34)
+mean(data_tv) + c(1,-1) * qnorm(0.005) * sd(data_tv)/sqrt(34)
+```
+
+For (c), this is a small sample and we do not know the population variance so we use the t distribution. It has $11$ degrees of freedom.
+```{r}
+mean(data_travel) + c(1,-1) * qt(0.025,11) * sd(data_travel)/sqrt(12)
+mean(data_travel) + c(1,-1) * qt(0.005,11) * sd(data_travel)/sqrt(12)
+```
+
+The t distribution can only be used if the sample appears to come from a normal
+distribution. This may not be the case here as can be seen from the boxplot below.
+```{r}
+boxplot(data_travel)
+```
+
+### Question 3
+
+For the data set a 95% CI is calculated on R using the t.test command as
+```{r}
+data3=c(12.4, 16.7, 20.5, 17, 10.6, 14.9, 16.8, 21.6, 17.7, 10.2, 15.1, 
+18.2, 19.3, 21, 15.8)
+t.test(data3)
+```
+
+This gives a $95\%$ confidence interval as
+$$
+(14.6, 18.5)
+$$
+
+Now for a $99\%$ CI:
+```{r}
+t.test(data3,conf.level = 0.99)
+```
+
+The $99\%$ CI is 
+$$
+(13.8,19.2)
+$$
+```{r}
+boxplot(data3)
+stem(data3)
+```
+
+Both these look normally distributed so the t distribution seems appropriate.
+
+```{r}
+mean(data3) +c(-1,1)* 1.96 * sd(data3)/sqrt(15)
+```
+This gives a slightly narrower CI than that in (a). However, as this is quite a
+small sample, the t distribution should be used if possible.
+
+### Question 4
+
+A laboratory experiment is performed to compare two methods of evaluating the
+coefficient of thermal expansion of a polymer. Samples of eighteen varying grades of
+a polymer are used, nine with method A and nine with method B, yielding the
+following results:
+```{r}
+methodA=c(6.8,8.4,7.9,6.5,9.5,7.0,9.1,7.5,9.8)
+methodB=c(7.2,8.3,8.3,7.5,9.5,7.7,9.4,7.8,10.3)
+```
+
+We can determine a $95\%$ confidence interval using
+```{r}
+t.test(methodB,methodA,var.equal = TRUE)
+```
+
+
+### Question 5
+
+An investigator was studying people’s ability to recognise faces when they are shown in black-and-white and in colour. She had 21 volunteers and split them into two groups: one group of 10 were shown the faces in black-and-white and the other
+group of 11 were shown them in colour. The variable measured was the average time (secs) taken to recognise the faces.
+
+```{r}
+bw=c(1.7, 1.5, 1.6, 1.9, 1.2, 1.9, 1.6, 1.2, 1.2, 1)
+col=c(1.3, 1.8, 1.6, 1.2, 1.7, 1.5, 1, 1.4, 1.5, 1, 1.1)
+var.test(bw,col)
+```
+So our CI is 
+$$
+(0.346, 5.180)
+$$
+
+Using the same technique as in Q4, a 95% CI for the differences in population
+means is $(-0.16,0.38)$
+```{r}
+t.test(bw,col,var.equal = TRUE)
+```
+
+This is valid if the data come from normal populations and if the population variances are equal. Since, from (a), 1 lies in the
+interval (0.3458132, 5.1800391), there is not much evidence that the variances are different.
+
+We now plot boxplots
+```{r}
+boxplot(bw,col,names=c("b-w","col"))
+```
+
+Since the two boxplots overlap, there is not much evidence that the population
+means are significantly different. This is consistent with 0 being included in the CI
+(0.3458132, 5.1800391). They also show reasonable normality further justifying the
+use of the t distribution.
+
+### Question 6
+
+We have the data
+```{r}
+data6=c(241, 251, 258, 246, 202, 246, 246, 301, 260, 228, 275, 266, 
+264, 250, 258, 265, 240, 227, 271, 306, 269, 252, 242, 274, 222, 
+244, 218, 228, 247, 202, 287, 279, 242, 262, 268, 226, 303, 214, 
+242, 233)
+```
+
+We obtain a $95\%$ confidence interval
+```{r}
+t.test(data6)
+```
+The 95% CI does not contain the value 260 so it does not seem plausible that these
+data come from a population with mean 260. We can also check this using the
+method of hypothesis testing covered later. The P-value suggests we have evidence
+to reject the null hypothesis.
+(The code we will use later is t.test(x,mu=260))
+```{r}
+t.test(data6,mu=260)
+```

@@ -1,0 +1,181 @@
+---
+title: "Practical 2"
+output: html_notebook
+---
+
+### Question 1
+
+We start by generating samples from a normal distribution:
+```{r}
+xpop=rnorm(10000,50,6)
+```
+If unsure with this command use ?rnorm to check how it works.
+
+Now we can use the command sample to create 100 samples each of size 4. 
+```{r}
+x1=sample(xpop,100,replace=FALSE)
+x2=sample(xpop,100,replace=FALSE)
+x3=sample(xpop,100,replace=FALSE)
+x4=sample(xpop,100,replace=FALSE)
+```
+We will combine these samples into a matrix 
+```{r}
+m1=cbind(x1,x2,x3,x4)
+```
+
+We can look at the mean of each sample using the code:
+```{r}
+xbar=apply(m1,1,mean)
+xbar
+```
+Here we have a list of 100 values each giving the mean of a sample of size 4.
+
+In order to justify whether the central limit holds in the case of samples of size 4 there are 3 things we need to check about the sample mean:
+
+ * The mean, this should be the same as the population mean, $\mu$;
+ * The variance, this should be the population variance divided by sample size, $\frac{\sigma^2}{n}$;
+ * The distribution, this should be a normal distribution
+
+First, let us check the mean.
+The mean of the expected value of the population is
+```{r}
+mean(xpop)
+```
+Note in this case we know we simulated the population from a normal random variable with mean $50$.
+We can compare this with mean of the sample means:
+```{r}
+mean(xbar)
+```
+As we can see here the mean of the sample mean is very close to the population mean, if we needed more accuracy we could take more than 100 copies of each sample.
+
+Next let us compare the vaiance. According to the central limit theorem the variance should be given by $\sigma^2/n$, in this case this is given by
+```{r}
+var(xpop)/4
+```
+Due to how we constructed the population we know this should be approximately $6^2/4=9$.
+Compare this to the variance of the sample mean:
+```{r}
+var(xbar)
+```
+
+To assess the distribution we look at the histogram, boxplots and the Q-Q plot. We will plot histograms on the same scale using the command xlim
+```{r}
+par(mfrow=c(1,2)) #To split the graphics into two columns
+hist(xpop,xlim=c(20,80))
+hist(xbar,xlim=c(20,80))
+```
+Note it is important here to use the same scale so we can easily see differences in the variance. We are using xpop here as the population (although really it is just an extrememly large sample.
+
+The histogram does not give us any reason to doubt that the distribution is normally distributed.
+
+```{r}
+boxplot(xpop,xbar, names=c("Population","Sample Mean"),horizontal = TRUE)
+```
+We see that the distribution is roughly symmetrical so again this is consistent with the normal distribution.
+
+Finally we draw a Q-Q plot 
+```{r}
+qqnorm(xbar)
+qqline(xbar) # Line of best fit to help with the comparison
+```
+We see that the sample mean data is very close to a straight line in the Q-Q plot which means that the data is likely to be from a normal distribution.
+
+Therefore we can verify that the central limit theorem holds in this case.
+
+If we take samples of size 9 from a normal random variable we will see the same behaviour.
+
+### Question 2
+
+Simulate $\texttt{nsim}=10^4$ samples of size $n=6$ from a $\mathrm{Gamma}(2,1)$ distribution. For each sample calculate
+$$
+\hat{\theta}_1=\bar{X}, \quad \hat{\theta}_2 = \frac{9}{30}(X_1+X_2+X_3)+\frac{1}{30}(X_4+X_5+X_6)
+$$
+```{r}
+nsim = 10^4
+# Initialise vectors as arrays of 0's
+theta.1 = rep(0, nsim)
+theta.2 = rep(0, nsim)
+for (i in 1:nsim) {
+x = rgamma(n = 6, shape = 2, rate = 1)
+theta.1[i] = mean(x)
+theta.2[i] = (9/30) * sum(x[1:3]) + (1/30) * sum(x[4:6])
+}
+```
+
+We want to verify that $\hat{\theta}_1=\bar{X}\sim \mathrm{Gamma}(12,6)$. We start by plotting a histogram
+```{r}
+hist(theta.1,xlim=c(0,5),ylim=c(0,0.7),freq=F,main="")
+title(main="Histogram of theta.1 and pdf of Gamma(12,6)")
+# Then define a grid of values and add the line of the pdf values to plot
+x.grid = seq(0.0001,5,length=1000)
+lines(x.grid,dgamma(x.grid,shape=12,rate=6),col="red")
+```
+Since the pdf of $\mathrm{Gamma}(12,6)$ follows the shape of the histogram of theta.1 very well, the sampling distribution of $\hat{\theta}_1$ verifies the required rule.
+
+Now for $\hat{\theta}_2$
+```{r}
+par(mfrow=c(1,2))
+hist(theta.1,xlim=c(0,5),freq=F)
+hist(theta.2,xlim=c(0,5),freq=F)
+```
+
+The simulation suggests that both estimators are unbiased, since their means are equal to $2$ (approximately). (Notice that these values will vary if you repeat the simulation - so the values you obtain will be slightly different! But they are, of course, estimates of the true
+means of the two sampling distributions - their accuracy will improve as $\texttt{nsim}$ gets larger). Since both estimators are unbiased, their variance will tell us about their MSE. The plots
+show that $\hat{\theta}_2$ has larger variance. Checking in R gives the following estimates of the mean
+and variance of the two sampling distributions:
+```{r}
+mean(theta.1)
+mean(theta.2)
+var(theta.1)
+var(theta.2)
+```
+
+### Question 3
+
+```{r}
+nsim = 10^4
+# Initialise vectors as arrays of 0's
+theta.a = rep(0,nsim)
+theta.b = rep(0,nsim)
+for (i in 1:nsim){
+x = runif(n=6,min=0,max=2)
+theta.a[i] = 2*mean(x)
+theta.b[i] = max(x)
+}
+```
+
+```{r}
+mean(theta.a)
+mean(theta.b)
+```
+The mean of $\hat{\theta}_1$ appears to be unbiased while $\hat{\theta}_2$ shows some bias. 
+
+```{r}
+var(theta.a)
+var(theta.b)
+```
+
+The variance for $\hat{\theta}_2$ is much smaller than $\hat{\theta}_1$.
+
+```{r}
+(mean(theta.a)-2)^2+var(theta.a)
+(mean(theta.b)-2)^2+var(theta.b)
+```
+Therefore $\hat{\theta}_b$ is more efficient then $\hat{\theta}_a$.
+
+### Question 4
+
+We are given the data
+```{r}
+sample=c(3.9, 3.4, 5.2, 2.6, 3.4, 2.7, 3.1, 2.4, 4.2, 1.7, 2.4, 3.3, 2.3, 2.0, 3.4, 2.9, 2.5, 3.9, 2.3, 1.1)
+```
+
+```{r}
+n=length(sample)
+mean_sam=mean(sample)
+var_sam=var(sample)
+alpha_hat=n*mean_sam^2/((n-1)*var_sam)
+alpha_hat
+beta_hat=n*mean_sam/((n-1)*var_sam)
+beta_hat
+```

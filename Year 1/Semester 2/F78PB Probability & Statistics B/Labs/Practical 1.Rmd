@@ -1,0 +1,370 @@
+---
+title: "Practical 1"
+output: html_notebook
+---
+
+### Question 1
+
+Enter in the data
+
+60 85 72 59 37 75 93 7 98 63 41 90 5 17 97
+
+Make a stem and leaf plot.
+
+We will call our data "sample1", it is important to use a name which will make sense to use when we come back to this code later on.
+```{r}
+sample1=c(60,85,72,59,37,75,93,7,98,63,41,90,5,17,97)
+```
+
+```{r}
+stem(sample1)
+```
+This default has caused some ambiguity, where is 17 on this output, is 0|7 7 or 17? We can use the option scale to split the output and in this case (scale=2) use twice as many stem options.
+
+```{r}
+stem(sample1,scale=2)
+```
+
+### Question 2
+
+Read this stem and leaf plot, enter in the data and make a histogram:
+The decimal point is 1 digit(s) to the right of the |
+8 | 028
+9 | 115578
+10 | 1669
+11 | 01
+
+```{r}
+sample2=c(80,82,88,91,91,95,95,97,98,101,106,106,109,110,111)
+hist(sample2)
+```
+
+### Question 3
+One can generate random data with the “R" commands. For example
+x = rnorm(100)
+produces 100 random numbers with a standardised normal distribution. Create two different histograms for two different instances of defining x as above. Do you get the same histograms?
+
+```{r}
+norm_samples1=rnorm(100)
+norm_samples2=rnorm(100)
+```
+
+Lets plot these as a histogram
+```{r}
+hist(norm_samples1)
+hist(norm_samples2)
+```
+Since the two samples are random they are not the same, although if we have more more data then the two histograms will become more similar.
+
+
+### Question 4
+
+Data were collected on the time (in days) until each of 200 claims is settled by the
+insurer in a certain insurance portfolio. The data are given in the file settle time.txt which
+can be found on Canvas under Practical Sheets → Practical Sheet 1.
+
+(a)Download (or copy) the data on your computer and read the values into R.[A useful command in R is settle.times=scan() ].
+```{r}
+settle.times=scan(file="settle_times.txt")
+```
+
+(b)Summarise the data using the mean and the five point summary, and comment
+on the symmetry of the distribution of the data based on these measures (useful
+commands in R are mean, quantile(), summary() ).
+
+```{r}
+cat('The mean of the settle_times data is given by ',mean(settle.times), '\n')
+cat('The quantiles of the settle_times data is given by ', quantile(settle.times), '\n')
+print('The summary of the settle_times data is given by')
+summary(settle.times)
+```
+The mean is considerably larger than the median, implying that the distribution is skewed to the right. Also, the maximum value is far away from the median and the third quartile, which reveals a long right tail.
+
+(c) Produce a frequency table of the times to settlement. It may be useful to divide the range of
+the data into intervals of 30 days, i.e. [0, 30), [30, 60), . . . . [390, 420). Note that whether an
+interval is right-open or left-open will make a difference. In R you can do this as follows:
+
+```{r}
+settle.breaks = seq(0,420,by=30)
+settle.table = table(cut(settle.times, breaks = settle.breaks,
+right=F))
+settle.table
+```
+
+(d) Draw a histogram of the data (using the same intervals as in the table above) and a boxplot.
+
+```{r}
+hist(settle.times,breaks=settle.breaks,freq=TRUE,col="gray",
+main="Histogram of claims settling time",xlab="Days")
+boxplot(settle.times, horizontal = T)
+```
+
+(e) Comment briefly on the shape of the distribution of the data. Can you suggest a suitable
+theoretical distribution for the time until claims are settled in this portfolio?
+
+It is obvious that the distribution of time to settlement for these claims is positively skewed, with a mode close to zero. An exponential model may be appropriate.
+
+### Question 5
+
+The following data are a sample from a survey on property prices (in £1000) in a city in Scotland:
+
+191.6 216.7 196.6 220.7 301.0 236.1 142.4 190.4 200.9 241.8
+184.9 202.1 156.7 198.1 240.1 169.7 151.8 257.0 347.9 281.6
+
+These data have been considered in Tutorial 1 Question 8.
+In addition to the data above, suppose that a similar survey in a different Scottish city gave the
+following property prices (again in £1000):
+
+130.4 155.1 155.7 187.2 100.4 142.8 118.3 154.8 121.1 126.1
+137.8 158.7 147.0 132.3 133.0 127.0 88.6 98.8 155.4 124.9
+
+(a) Compare the dispersion of the two data sets using histograms (remember to put the two data
+sets on the same scale for comparison).
+
+First we add the data
+```{r}
+property1 = c(191.6,216.7,196.6,220.7,301.0,236.1,142.4,190.4,200.9,241.8,184.9,202.1,156.7,198.1,240.1,169.7,151.8,257.0,347.9,281.6)
+property2 = c(130.4,155.1, 155.7, 187.2, 100.4, 142.8, 118.3, 154.8, 121.1, 126.1, 137.8, 158.7, 147.0, 132.3, 133.0, 127.0, 88.6, 98.8, 155.4, 124.9)
+```
+
+Next we draw the two histograms using the option xlim to ensure the scales are the same
+```{r}
+hist(property1,xlim=c(80,350))
+hist(property2,xlim=c(80,350))
+```
+
+(b) Compare the dispersion of the two data sets using boxplots again putting the two data sets
+on the same scale for comparison.
+
+```{r}
+boxplot(property1,property2)
+```
+
+(c) Now compare the dispersion of the two samples using appropriate numerical measures of
+spread. (Hint: is the variance suitable here?)
+
+We start by calculating the variances.
+```{r}
+print(paste0("Variance of City 1: ", var(property1)))
+print(paste0("Variance of City 2: ", var(property2)))
+```
+Comment: The property price of City 1 has greater dispersion than of City 2, since it has larger variance
+as can be seen above and also higher interquartile range of about 50,000 pounds compared with City 2
+of approximately 30,000 pounds.
+Notice (e.g. from the boxplot above) that the level of prices is different in the two cities. Remember that
+the variance depends on the scale of the measured values, so it may not be appropriate for comparisons
+here. Instead, calculate the coefficient of variation, which doesn't depend on the scale of the data:
+
+```{r}
+print(paste0("Coefficient of variation of City 1: ", sd(property1)/mean(property1)))
+print(paste0("Coefficient of variation of City 1: ", sd(property2)/mean(property2)))
+```
+The coefficient of variation for the two data sets is closer than the standard deviation, implying that the variation of the prices in the two cities is not as different as the sample variances suggest.
+
+### Question 6
+
+Produce functions in R to calculate the coefficient of symmetry and the kurtosis using the code
+below.
+```{r}
+beta1.fn = function(x)
+{
+  sum.dev3 = sum( (x - mean(x))^3 )
+  b1 = (sum.dev3/length(x))/(sd(x))^3
+  cat("\n","Coefficient of symmetry for these data is: ",
+  b1, "\n\n")
+}
+
+kurtosis.fn = function(x)
+{
+  sum.dev4 = sum( (x - mean(x))^4 )
+  k1 = ((sum.dev4/length(x))/(sd(x))^4)-3
+  cat("\n","Kurtosis for these data is: ", k1, "\n\n")
+}
+```
+
+Find the mean, standard deviation, coefficient of symmetry and kurtosis for the following data:
+```{r}
+data6=c(33, 23, 34, 27, 32, 45, 5, 50, 27, 25, 25, 8, 27, 13, 31, 9, 16, 10, 40, 35, 41, 4, 22, 41, 43, 52, 25, 40, 27, 22)
+```
+Using these new functions we have
+```{r}
+cat("\n","Mean for this data is : ", mean(data6), "\n\n")
+cat("\n","Standard Deviation for this data is : ", sd(data6), "\n\n")
+beta1.fn(data6)
+kurtosis.fn(data6)
+```
+
+### Question 7
+
+Work through Tutorial Sheet 1 Question 2 using R to confirm your manual calculations and graphs.
+
+### Question 8
+
+Obtain and attach the data set cfb
+by typing the following:
+```{r}
+library(UsingR)
+data(cfb)
+attach(cfb)
+```
+One of the vectors in this data frame is called INCOME. It represents the yearly income figures by
+households in a survey of consumer finances in the US in 2001. You can see more information about
+it by using
+
+?cfb
+
+(a) Obtain a histogram of the INCOME data. What does it tell you?
+
+```{r}
+hist(INCOME)
+```
+Comment: From the shape of the histogram, there is clearly one bin that differences from others. This shows that many (or almost every) households receive the yearly income of 20,000 pounds or less. There are very few households who get more than 20,000 pounds per year of more.
+
+(b) Calculate the mean income using mean(INCOME). How good is this statistic in describing the
+data?
+
+```{r}
+mean(INCOME)
+```
+
+Comment: The mean for yearly income of these data does not seem to be much helpful, because the data was distorted by very large of 1,500,000 pounds per year.
+
+(c) A subcommand of the mean() command is “trim”. Use ?mean to investigate what this subcommand
+does, and experiment with various values of “trim”.
+
+Let us try a selection of trimmed means
+```{r}
+mean(INCOME,trim=0)
+mean(INCOME,trim=0.1)
+mean(INCOME,trim=0.2)
+mean(INCOME,trim=0.3)
+mean(INCOME,trim=0.4)
+mean(INCOME,trim=0.5)
+```
+
+(d) Calculate the median of the INCOME data using median(INCOME). Does this give a better “feel”
+for the data set than the mean?
+
+```{r}
+median(INCOME)
+```
+
+Comment: This value gives a better feel for the data set than the mean, since it is not affected by extreme values.
+
+
+(e) Calculate the 0.1 quantile and the third quartile for the INCOME data. Use, e.g., quantile(INCOME,
+0.1).
+
+```{r}
+quantile(INCOME,c(0.1,0.75))
+```
+
+### Question 9
+
+Load the Old Faithful Geyser data with
+```{r}
+data(faithful)
+```
+Type also ?faithful at the prompt to obtain the documentation on these data. Make available also the individual vectors eruptions and waiting in the data frame faithful by typing
+```{r}
+attach(faithful)
+```
+For each of these two vectors, experiment with functions length, sum, min, max, mean, median, sd,
+and summary, e.g.,
+length(eruptions)
+(which just gives the length of the vector). If necessary, consult the documentation on any of these
+functions.
+```{r}
+cat("\n","Length of eruptions is : ", length(eruptions), "\n\n")
+cat("\n","Sum of eruptions is : ", sum(eruptions), "\n\n")
+cat("\n","Min of eruptions is : ", min(eruptions), "\n\n")
+cat("\n","Max of eruptions is : ", max(eruptions), "\n\n")
+cat("\n","Mean of eruptions is : ", mean(eruptions), "\n\n")
+cat("\n","Median of eruptions is : ", median(eruptions), "\n\n")
+cat("\n","Standard deviation of eruptions is : ", sd(eruptions), "\n\n")
+cat("\n","Summuary of eruptions is : \n")
+summary(eruptions)
+```
+```{r}
+cat("\n","Length of waiting is : ", length(waiting), "\n\n")
+cat("\n","Sum of waiting is : ", sum(waiting), "\n\n")
+cat("\n","Min of waiting is : ", min(waiting), "\n\n")
+cat("\n","Max of waiting is : ", max(waiting), "\n\n")
+cat("\n","Mean of waiting is : ", mean(waiting), "\n\n")
+cat("\n","Median of waiting is : ", median(waiting), "\n\n")
+cat("\n","Standard deviation of waiting is : ", sd(waiting), "\n\n")
+cat("\n","Summuary of waiting is : \n")
+summary(waiting)
+```
+
+Use the function hist to show the distributions of both eruptions and waiting. 
+```{r}
+hist(eruptions)
+hist(waiting)
+```
+
+Now investigate the
+relationship between the two variables with
+plot(eruptions,waiting)
+```{r}
+plot(eruptions,waiting)
+```
+
+Give a detailed, but concise, description (about 200 words) of the important features of the data
+and of the relationship between these two variables.
+
+Comment:
+As we can see from the shape of both of the histograms, they seem to follow a sort of inverse Normal distribution. The data does not peak at the centre of the distribution as is typical with a Normal distribution but instead has a dip. It peaks twice at both of the far ends of the graph. The histogram graph of eruption time tends to be negatively skewed. However, histogram of waiting time is symmetrical and not skewed.
+The following plot shows the association between eruption time and waiting time for the next eruption. As we can see from the dot plot, the data is not concentrated at the centre of the graph but is instead spread out over most of the graph. It is clear from these data that as the eruption time increases, the waiting time also rises (both data are proportional to each other).
+
+### Question 10
+
+A coin is given 10 independent tosses, each of which lands heads with probability p. Let the random
+variable N denote the total number of heads obtained. Then, in R, given p and any value of n, we
+can calculate the probability of n heads as
+dbinom(n,10,p)
+
+Set p = 0.3 (not a very fair coin!) and find the probabilities of various values of n in the range 0 to
+10.
+```{r}
+for (n in 0:10) {
+ print(paste0(" For n=",n," the probability of n heads is ",dbinom(n,10,0.3)))
+}
+
+```
+Now generate the entire probability function of the random variable N with
+```{r}
+pf = dbinom(0:10,10,0.3)
+```
+Use sum to verify that the sum of these probabilities is 1, and plot a bar chart to show their
+distribution with
+barplot(pf, names = 0:10)
+
+To verify the probabilities sum to one:
+```{r}
+sum(pf)
+```
+Which gives 1 as we expect.
+
+For the bar plot:
+```{r}
+barplot(pf,names.arg=0:10)
+```
+What are the first, second, and third most likely numbers of heads? 
+
+The most likely numbers of heads are 3,2 then 4.
+
+Calculate the mean and standard deviation of this distribution with
+```{r}
+mn = sum(0:10 * pf)
+cat("\n","The expected value is ",mn,"\n")
+stdev = sqrt(sum((0:10)^2 * pf) - mn^2)
+cat("\n","The standard deviation is ",stdev,"\n")
+```
+
+Verify that the values obtained agree with those obtained from your own knowledge of the binomial
+distribution.
+
+Comment: The value obtained agrees because this is a Normal approximation to the Binomial distribution. 
+$$\text{Mean} = n*p = 10*0.3 = 3$$
+$$\text{Standard deviation} = \sqrt{n*p*(1-p)} = \sqrt{10*0.3*0.7} = 1.449138$$
