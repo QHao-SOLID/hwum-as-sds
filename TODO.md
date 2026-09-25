@@ -1,0 +1,4 @@
+- Add Algorithmic & Scientific Programming course
+- Fix Philosophy & Current Issues
+- Textbooks for F79MA, F79SP & C29PE
+- Y2S2 & the rest
