@@ -78,5 +78,5 @@ The whole point is for this to outlive any one maintainer, cohort, or batch of s
 
 ---
 
-**— <NAME>**  
+**— Hao**  
 *Current keeper of the senior folder*
