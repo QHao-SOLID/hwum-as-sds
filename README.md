@@ -2,7 +2,7 @@
 
 > *The unofficial stash of everything seniors wish they had when they were juniors.*
 
-Hi, I’m **<NAME>**, and I’m currently the sole maintainer of this senior folder.
+Hi, I’m **Hao**, and I’m currently the sole maintainer of this senior folder.
 
 I’m not entirely sure how you found your way here — perhaps a senior passed it down to you, perhaps a friend sent you the link, or perhaps you simply stumbled upon it.
 
